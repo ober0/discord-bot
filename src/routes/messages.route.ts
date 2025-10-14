@@ -1,18 +1,28 @@
 import client from "../index";
-import { Events, GuildMember } from "discord.js";
-import { checkUserIsAdmin } from "../tools/check-admin.tools";
 import { getPidorLists } from "../services/get-pidor-lists";
+import { Events } from "discord.js";
+import { sendAllPresences } from "../services/send-all-presences";
 
-client.on("messageCreate", async (message) => {
+client.on(Events.MessageCreate, async (message) => {
     if (message.author.bot) return;
     if (!message.guild) return;
 
-    if (message.mentions.has(client.user?.id!)) {
-        const content = message.content.replace(`<@${client.user?.id}>`, "").trim();
+    let content: string;
 
-        if (["список пидорасов", "список пидоров", "пидоры", "пидорасы"].includes(content.toLowerCase())) {
+    if (message.mentions.has(client.user?.id!)) {
+        content = message.content.replace(`<@${client.user?.id}>`, "").trim().toLowerCase();
+
+        if (["список пидорасов", "список пидоров", "пидоры", "пидорасы"].includes(content)) {
             await getPidorLists(message);
             return;
+        } else if (content === "активности") {
+            await sendAllPresences(message);
+        }
+    } else {
+        content = message.content;
+
+        if (content === "!actives" || content === "!precenses") {
+            await sendAllPresences(message);
         }
     }
 });
