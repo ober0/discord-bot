@@ -9,7 +9,7 @@ import {
 
 export async function blow(interaction: ChatInputCommandInteraction) {
     const user = interaction.options.getUser("юзер");
-    const minutes = interaction.options.getInteger("время") ?? 0.1;
+    const minutes = interaction.options.getInteger("время") ?? 5;
 
     if (!user) {
         return await interaction.reply({

@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+    ds-bot-1:
+        build: .
+        container_name: ds-bot-1
+        restart: always
+        env_file:
+            - .env
+        command: >
+            sh -c "
+                npm run update-slash-commands:prod
+                npm run prod
+            " 

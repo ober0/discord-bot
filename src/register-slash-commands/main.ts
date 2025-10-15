@@ -7,8 +7,8 @@ import {
 } from "discord.js";
 import { BOT_TOKEN, CLIENT_ID, GUILD_ID } from "../cfg";
 import { getActivities } from "./commands/activities";
-import { getPidorlist } from "./commands/pidorlist.ts";
-import { getBlow } from "./commands/blow.ts";
+import { getPidorlist } from "./commands/pidorlist";
+import { getBlow } from "./commands/blow";
 
 async function deleteAllCommands(rest: REST) {
     rest.put(Routes.applicationGuildCommands(CLIENT_ID!, GUILD_ID!), { body: [] }).catch(console.error);
