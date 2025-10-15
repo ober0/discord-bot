@@ -19,4 +19,10 @@ RUN npm ci --omit=dev && npm cache clean --force
 
 COPY --from=build /opt/app/dist ./dist
 
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S discordbot -u 1001
+
+RUN chown -R discordbot:nodejs /app
+USER discordbot
+
 CMD ["npm", "run", "prod"]
