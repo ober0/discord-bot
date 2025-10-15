@@ -6,7 +6,9 @@
   "scripts": {
     "build": "tsc",
     "dev": "ts-node src/main.ts",
-    "prod": "node dist/main.js"
+    "prod": "node dist/main.js",
+    "update-slash-commands:prod": "node dist/register-slash-commands/main.js",
+    "update-slash-commands": "ts-node src/register-slash-commands/main.ts"
   },
   "devDependencies": {
     "eslint": "^9.37.0",

@@ -1,7 +1,5 @@
 import client from "./index";
 
-import "./register-slash-commands/main";
-
 import "./routes/precenses.route";
 import "./routes/interaction.route";
 
