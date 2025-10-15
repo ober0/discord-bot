@@ -1,10 +1,10 @@
-import { EmbedBuilder, Message } from "discord.js";
+import { ChatInputCommandInteraction, EmbedBuilder, Message } from "discord.js";
 
-export async function getPidorLists(message: Message) {
-    const onlineMembers = message.guild?.members.cache.filter((m) => m.presence && m.presence.status !== "offline");
+export async function getPidorLists(interaction: ChatInputCommandInteraction) {
+    const onlineMembers = interaction.guild?.members.cache.filter((m) => m.presence && m.presence.status !== "offline");
 
     if (!onlineMembers) {
-        return message.reply("Сейчас никто не играет в Rocket League :(");
+        return interaction.reply("Сейчас никто не играет в Rocket League :(");
     }
 
     const fields = onlineMembers
@@ -28,7 +28,7 @@ export async function getPidorLists(message: Message) {
         });
 
     if (!fields.length) {
-        return message.reply("Сейчас никто не играет в Rocket League :(");
+        return interaction.reply("Сейчас никто не играет в Rocket League :(");
     }
 
     const embed = new EmbedBuilder()
@@ -36,5 +36,5 @@ export async function getPidorLists(message: Message) {
         .addFields(fields)
         .setColor(0x1a73e8)
         .setTimestamp();
-    return message.reply({ embeds: [embed] });
+    return interaction.reply({ embeds: [embed] });
 }
