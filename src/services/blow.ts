@@ -6,10 +6,12 @@ import {
     ComponentType,
     MessageFlags
 } from "discord.js";
+import { v4 as uuidv4 } from "uuid";
 
 export async function blow(interaction: ChatInputCommandInteraction) {
     const user = interaction.options.getUser("юзер");
     const minutes = interaction.options.getInteger("время") ?? 5;
+    const randomUuid = uuidv4();
 
     if (!user) {
         return await interaction.reply({
@@ -18,31 +20,20 @@ export async function blow(interaction: ChatInputCommandInteraction) {
         });
     }
 
+    await interaction.deferReply();
+
     let count = 0;
     const votedUsers = new Set<string>();
 
     const createMainButton = (currentCount: number) => {
         return new ButtonBuilder()
-            .setCustomId(`blow-user-${user.id}`)
+            .setCustomId(`blow-user-${user.id}-${randomUuid}`)
             .setLabel(`Обоссали ${currentCount} раз`)
             .setStyle(ButtonStyle.Primary)
             .setEmoji("💦");
     };
 
-    const createPersonalButton = (currentCount: number, hasVoted: boolean) => {
-        return new ButtonBuilder()
-            .setCustomId(`blow-user-${user.id}`)
-            .setLabel(hasVoted ? `Вы обоссали ${user.username}` : `Обоссали ${currentCount} раз`)
-            .setStyle(hasVoted ? ButtonStyle.Success : ButtonStyle.Primary)
-            .setEmoji("💦")
-            .setDisabled(hasVoted);
-    };
-
-    const mainButton = createMainButton(count);
-    const row = new ActionRowBuilder<ButtonBuilder>().addComponents(mainButton);
-
     const endTime = new Date(Date.now() + 1000 * 60 * minutes);
-
     const formattedEndTime = endTime.toLocaleDateString("ru-RU", {
         day: "2-digit",
         month: "2-digit",
@@ -52,69 +43,89 @@ export async function blow(interaction: ChatInputCommandInteraction) {
         hour12: false
     });
 
-    const response = await interaction.reply({
-        content: `<@${user.id}> **Тебя отпетушили!** \n\nНажмите на кнопку, чтобы **обоссать** ${user.username}\nУ вас есть **${minutes} минут (до ${formattedEndTime})**`,
-        components: [row]
-    });
+    try {
+        const response = await interaction.editReply({
+            content: `<@${user.id}> **Тебя отпетушили!** \n\nНажмите на кнопку, чтобы **обоссать** ${user.username}\nУ вас есть **${minutes} минут (до ${formattedEndTime})**`,
+            components: [new ActionRowBuilder<ButtonBuilder>().addComponents(createMainButton(count))]
+        });
 
-    const collector = response.createMessageComponentCollector({
-        componentType: ComponentType.Button,
-        time: 1000 * 60 * minutes
-    });
+        const collector = response.createMessageComponentCollector({
+            componentType: ComponentType.Button,
+            time: 1000 * 60 * minutes
+        });
 
-    collector.on("collect", async (i) => {
-        if (i.customId === `blow-user-${user.id}`) {
-            if (votedUsers.has(i.user.id)) {
-                return await i.followUp({
-                    content: `🚫 Вы уже обоссали ${user.username}! (Всего: ${count} раз)`,
-                    ephemeral: true
-                });
+        collector.on("collect", async (i) => {
+            if (i.customId === `blow-user-${user.id}-${randomUuid}`) {
+                if (votedUsers.has(i.user.id)) {
+                    await i.reply({
+                        content: `🚫 Вы уже обоссали ${user.username}!`,
+                        ephemeral: true
+                    });
+                    return;
+                }
+
+                votedUsers.add(i.user.id);
+                count++;
+
+                const updatedButton = createMainButton(count);
+                const updatedRow = new ActionRowBuilder<ButtonBuilder>().addComponents(updatedButton);
+
+                try {
+                    await i.update({
+                        content: `<@${user.id}> **Тебя отпетушили!** \n\nНажмите на кнопку, чтобы обоссать ${user.username}\nУ вас есть **${minutes} минут (до ${formattedEndTime})**`,
+                        components: [updatedRow]
+                    });
+                } catch (error) {
+                    console.error("Ошибка при обновлении:", error);
+                }
             }
+        });
 
-            votedUsers.add(i.user.id);
-            count++;
+        collector.on("end", async () => {
+            const disabledButton = new ButtonBuilder()
+                .setCustomId(`blow-user-${user.id}-${randomUuid}`)
+                .setLabel(`Обоссали ${count} раз`)
+                .setStyle(ButtonStyle.Secondary)
+                .setEmoji("💦")
+                .setDisabled(true);
 
-            const updatedButton = createMainButton(count);
-            const updatedRow = new ActionRowBuilder<ButtonBuilder>().addComponents(updatedButton);
+            const disabledRow = new ActionRowBuilder<ButtonBuilder>().addComponents(disabledButton);
 
-            await i.update({
-                content: `<@${user.id}> **Тебя отпетушили!** \nНажмите на кнопку, чтобы обоссать ${user.username}\nУ вас есть **${minutes} минут (до ${formattedEndTime})**`,
-                components: [updatedRow]
+            try {
+                await interaction.editReply({
+                    components: [disabledRow]
+                });
+
+                await interaction.followUp({
+                    content: `🏁 **Голосование завершено!**\nНа ${user} поссали ${count} человек`,
+                    allowedMentions: { users: [] }
+                });
+
+                if (votedUsers.size > 0) {
+                    const users = Array.from(votedUsers);
+                    const userPromises = users.map((userId) =>
+                        interaction.guild?.members.fetch(userId).catch(() => null)
+                    );
+                    const members = await Promise.all(userPromises);
+                    const validMembers = members.filter(Boolean);
+                    const userList = validMembers.map((member) => `• ${member?.user.username}`).join("\n");
+
+                    await interaction.followUp({
+                        content: `Список нажавших кнопку: \n${userList}`,
+                        flags: MessageFlags.Ephemeral
+                    });
+                }
+            } catch (error) {
+                console.error("Ошибка при завершении:", error);
+            }
+        });
+    } catch (error) {
+        console.error("Ошибка в команде blow:", error);
+        if (!interaction.replied) {
+            await interaction.followUp({
+                content: "Произошла ошибка при выполнении команды",
+                ephemeral: true
             });
         }
-    });
-
-    collector.on("end", async () => {
-        const disabledButton = new ButtonBuilder()
-            .setCustomId(`blow-user-${user.id}`)
-            .setLabel(`Обоссали ${count} раз`)
-            .setStyle(ButtonStyle.Secondary)
-            .setEmoji("💦")
-            .setDisabled(true);
-
-        const disabledRow = new ActionRowBuilder<ButtonBuilder>().addComponents(disabledButton);
-
-        await interaction.editReply({
-            components: [disabledRow]
-        });
-
-        await interaction.followUp({
-            content: `🏁 **Голосование завершено!**\nНа ${user} поссали ${count} человек`,
-            allowedMentions: { users: [] }
-        });
-
-        const users = Array.from(votedUsers);
-
-        const userPromises = users.map((userId) => interaction.guild?.members.fetch(userId).catch(() => null));
-        const members = await Promise.all(userPromises);
-
-        const validMembers = members.filter(Boolean);
-
-        const userList = validMembers.map((member) => `• ${member?.user.username}`).join("\n");
-
-        await interaction.followUp({
-            content: `Список нажавших кнопку: \n ${userList}`,
-            flags: MessageFlags.Ephemeral
-        });
-    });
+    }
 }
