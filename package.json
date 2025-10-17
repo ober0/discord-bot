@@ -4,13 +4,15 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && tsc drizzle.config.prod.ts --outDir dist",
     "dev": "ts-node src/main.ts",
     "prod": "node dist/main.js",
     "update-slash-commands:prod": "node dist/register-slash-commands/main.js",
     "update-slash-commands": "ts-node src/register-slash-commands/main.ts",
-    "generate": "npx drizzle-kit generate",
-    "migrate": "npx drizzle-kit migrate"
+    "generate:dev": "npx drizzle-kit generate",
+    "migrate:dev": "npx drizzle-kit migrate",
+    "generate:prod": "npx drizzle-kit generate --config dist/drizzle.config.prod.js",
+    "migrate:prod": "npx drizzle-kit migrate --config dist/drizzle.config.prod.js"
   },
   "devDependencies": {
     "eslint": "^9.37.0",

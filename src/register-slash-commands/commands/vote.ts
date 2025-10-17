@@ -5,27 +5,27 @@ export async function getVote(): Promise<RESTPostAPIChatInputApplicationCommands
         .setName("голосование")
         .setDescription("Голосование")
         .addStringOption((option) => option.setName("вопрос").setDescription("Текст вопроса").setRequired(true))
+        .addStringOption((option) => option.setName("вариант-1").setDescription("Вариант 1").setRequired(true))
+        .addStringOption((option) => option.setName("вариант-2").setDescription("Вариант 2").setRequired(true))
         .addBooleanOption((option) =>
             option
                 .setName("несколько_ответов")
                 .setDescription("Разрешить несколько ответов? По умолчанию — true")
                 .setRequired(false)
-        )
-        .addStringOption((option) => option.setName("вариант-1").setDescription("Вариант 1").setRequired(true))
-        .addStringOption((option) => option.setName("вариант-2").setDescription("Вариант 2").setRequired(true));
+        );
 
     const voteEn = new SlashCommandBuilder()
         .setName("vote")
         .setDescription("Голосование")
         .addStringOption((option) => option.setName("вопрос").setDescription("Текст вопроса").setRequired(true))
+        .addStringOption((option) => option.setName("вариант-1").setDescription("Вариант 1").setRequired(true))
+        .addStringOption((option) => option.setName("вариант-2").setDescription("Вариант 2").setRequired(true))
         .addBooleanOption((option) =>
             option
                 .setName("несколько_ответов")
                 .setDescription("Разрешить несколько ответов? По умолчанию — true")
                 .setRequired(false)
-        )
-        .addStringOption((option) => option.setName("вариант-1").setDescription("Вариант 1").setRequired(true))
-        .addStringOption((option) => option.setName("вариант-2").setDescription("Вариант 2").setRequired(true));
+        );
 
     for (let i = 3; i <= 10; i++) {
         vote.addStringOption((option) =>

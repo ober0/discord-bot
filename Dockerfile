@@ -18,9 +18,11 @@ COPY package*.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 
 COPY --from=build /opt/app/dist ./dist
+COPY --from=build /opt/app/drizzle ./drizzle
 
 RUN useradd -m discorduser
 RUN chown -R discorduser:discorduser /opt/app
+
 USER discorduser
 
 CMD ["npm", "run", "prod"]

@@ -1,6 +1,6 @@
 import client from "./index";
 
-import "db/main";
+import "./db/main";
 
 import "./routes/precenses.route";
 import "./routes/interaction.route";

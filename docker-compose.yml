@@ -13,8 +13,8 @@ services:
             - DB_FILE_NAME=file:db.db
         command: >
             sh -c "
-                npm run generate
-                npm run migrate
+                npm run generate:prod
+                npm run migrate:prod
                 npm run update-slash-commands:prod
                 npm run prod
             " 
