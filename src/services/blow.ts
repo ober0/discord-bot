@@ -34,18 +34,19 @@ export async function blow(interaction: ChatInputCommandInteraction) {
     };
 
     const endTime = new Date(Date.now() + 1000 * 60 * minutes);
-    const formattedEndTime = endTime.toLocaleDateString("ru-RU", {
+    const formattedEndTime = endTime.toLocaleString("ru-RU", {
         day: "2-digit",
         month: "2-digit",
         year: "numeric",
         hour: "2-digit",
         minute: "2-digit",
-        hour12: false
+        hour12: false,
+        timeZone: "Europe/Moscow"
     });
 
     try {
         const response = await interaction.editReply({
-            content: `<@${user.id}> **Тебя отпетушили!** \n\nНажмите на кнопку, чтобы **обоссать** ${user.username}\nУ вас есть **${minutes} минут (до ${formattedEndTime})**`,
+            content: `<@${user.id}> **Тебя отпетушили!** \n\nНажмите на кнопку, чтобы **обоссать** ${user.username}\nУ вас есть **${minutes} минут (до ${formattedEndTime} МСК)**`,
             components: [new ActionRowBuilder<ButtonBuilder>().addComponents(createMainButton(count))]
         });
 
@@ -72,7 +73,7 @@ export async function blow(interaction: ChatInputCommandInteraction) {
 
                 try {
                     await i.update({
-                        content: `<@${user.id}> **Тебя отпетушили!** \n\nНажмите на кнопку, чтобы обоссать ${user.username}\nУ вас есть **${minutes} минут (до ${formattedEndTime})**`,
+                        content: `<@${user.id}> **Тебя отпетушили!** \n\nНажмите на кнопку, чтобы обоссать ${user.username}\nУ вас есть **${minutes} минут (до ${formattedEndTime} МСК)**`,
                         components: [updatedRow]
                     });
                 } catch (error) {
