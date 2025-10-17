@@ -17,3 +17,6 @@ if (!GUILD_ID) throw new Error("Не указан GUILD_ID");
 
 export const ADMIN_ROLE_ID = process.env.ADMIN_ROLE_ID;
 if (!ADMIN_ROLE_ID) throw new Error("Не указан ADMIN_ROLE_ID");
+
+export const BOTSPAM_CHANNEL_ID = process.env.BOTSPAM_CHANNEL_ID;
+if (!BOTSPAM_CHANNEL_ID) throw new Error("Не указан BOTSPAM_CHANNEL_ID");
