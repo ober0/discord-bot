@@ -14,3 +14,6 @@ if (!CLIENT_ID) throw new Error("Не указан CLIENT_ID");
 
 export const GUILD_ID = process.env.GUILD_ID;
 if (!GUILD_ID) throw new Error("Не указан GUILD_ID");
+
+export const ADMIN_ROLE_ID = process.env.ADMIN_ROLE_ID;
+if (!ADMIN_ROLE_ID) throw new Error("Не указан ADMIN_ROLE_ID");

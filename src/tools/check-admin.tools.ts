@@ -1,4 +1,5 @@
-import { Message } from "discord.js";
+import { ChatInputCommandInteraction, GuildMemberRoleManager, Message, MessageFlags } from "discord.js";
+import { ADMIN_ROLE_ID } from "../cfg";
 
 export async function checkUserIsAdmin(message: Message): Promise<boolean> {
     if (!message.member) return false;
@@ -6,7 +7,31 @@ export async function checkUserIsAdmin(message: Message): Promise<boolean> {
     const hasRole = message.member.roles.cache.some((role) => role.name === "самый самый ультра секси пацик на районе");
 
     if (!hasRole) {
-        await message.reply(`<@${message.author.id}>, у тебя недостаточно прав`);
+        await message.reply(`<@${message.author.id}>, у тебя недостаточно прав 😏`);
+        return false;
+    }
+
+    return true;
+}
+
+export async function checkUserIsAdminInteraction(interaction: ChatInputCommandInteraction): Promise<boolean> {
+    const member = interaction.member;
+
+    if (!member) return false;
+
+    let hasRole = false;
+
+    if ("roles" in member && member.roles instanceof GuildMemberRoleManager) {
+        hasRole = member.roles.cache.some((role) => role.name === "самый самый ультра секси пацик на районе");
+    } else if ("roles" in member && Array.isArray(member.roles)) {
+        hasRole = member.roles.includes(ADMIN_ROLE_ID!);
+    }
+
+    if (!hasRole) {
+        await interaction.reply({
+            content: `<@${interaction.user.id}>, у тебя недостаточно прав 😏`,
+            flags: MessageFlags.Ephemeral
+        });
         return false;
     }
 

@@ -2,16 +2,23 @@ import { ChatInputCommandInteraction, EmbedBuilder, MessageFlags } from "discord
 
 export async function sendUptime(interaction: ChatInputCommandInteraction) {
     const uptimeSeconds = process.uptime();
-    const uptimeDate = new Date(Date.now() - uptimeSeconds * 1000);
+    const startDate = new Date(Date.now() - uptimeSeconds * 1000);
 
-    const moscowTime = new Date(uptimeDate.toLocaleString("en-US", { timeZone: "Europe/Moscow" }));
+    // Форматирование сразу по МСК, без пересоздания объекта Date
+    const moscowStartTime = startDate.toLocaleString("ru-RU", {
+        timeZone: "Europe/Moscow",
+        hour12: false
+    });
 
-    const nowMoscow = new Date(new Date().toLocaleString("en-US", { timeZone: "Europe/Moscow" }));
+    const nowMoscowTime = new Date().toLocaleString("ru-RU", {
+        timeZone: "Europe/Moscow",
+        hour12: false
+    });
 
     const totalSeconds = Math.floor(uptimeSeconds);
-    const days = Math.floor(totalSeconds / (60 * 60 * 24));
-    const hours = Math.floor((totalSeconds % (60 * 60 * 24)) / (60 * 60));
-    const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
+    const days = Math.floor(totalSeconds / 86400);
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
 
     const uptimeString = [days ? `${days}д` : "", hours ? `${hours}ч` : "", minutes ? `${minutes}м` : "", `${seconds}с`]
@@ -22,21 +29,10 @@ export async function sendUptime(interaction: ChatInputCommandInteraction) {
         .setColor("#2b2d31")
         .setTitle("📊 Аптайм бота")
         .addFields(
-            {
-                name: "⏰ Время запуска (МСК)",
-                value: moscowTime.toLocaleString("ru-RU", {
-                    timeZone: "Europe/Moscow",
-                    hour12: false
-                })
-            },
-            {
-                name: "🕐 Время работы",
-                value: uptimeString
-            }
+            { name: "⏰ Время запуска (МСК)", value: moscowStartTime },
+            { name: "🕐 Время работы", value: uptimeString }
         )
-        .setFooter({
-            text: `Текущее время: ${nowMoscow.toLocaleTimeString("ru-RU", { timeZone: "Europe/Moscow", hour12: false })}`
-        });
+        .setFooter({ text: `Текущее время (МСК): ${nowMoscowTime}` });
 
     await interaction.reply({
         embeds: [embed],

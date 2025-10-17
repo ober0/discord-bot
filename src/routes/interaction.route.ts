@@ -4,6 +4,8 @@ import { getPidorLists } from "../services/get-pidor-lists";
 import { sendAllPresences } from "../services/send-all-presences";
 import { blow } from "../services/blow";
 import { sendUptime } from "../services/uptime";
+import { createVote } from "../services/vote";
+import { checkUserIsAdmin, checkUserIsAdminInteraction } from "../tools/check-admin.tools";
 
 client.on(Events.InteractionCreate, async (interaction) => {
     if (!interaction.isChatInputCommand()) return;
@@ -20,7 +22,12 @@ client.on(Events.InteractionCreate, async (interaction) => {
         await blow(interaction);
         return;
     } else if (command === "голосование" || command === "vote") {
+        await createVote(interaction);
+        return;
     } else if (command === "uptime") {
+        const isAdmin = await checkUserIsAdminInteraction(interaction);
+        if (!isAdmin) return;
+
         await sendUptime(interaction);
         return;
     }
