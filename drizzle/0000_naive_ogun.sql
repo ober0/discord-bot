@@ -1,10 +1,10 @@
-CREATE TABLE `answerOption` (
+CREATE TABLE IF NOT EXISTS `answerOption` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`quizId` integer NOT NULL,
 	`answer` text NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE `quiz` (
+CREATE TABLE IF NOT EXISTS `quiz` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`channelId` text NOT NULL,
 	`question` text NOT NULL,
@@ -12,7 +12,7 @@ CREATE TABLE `quiz` (
 	`remindAt` integer NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE `registeredAnswers` (
+CREATE TABLE IF NOT EXISTS `registeredAnswers` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`quizId` integer NOT NULL,
 	`answerId` integer NOT NULL,
