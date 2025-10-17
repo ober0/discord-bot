@@ -11,6 +11,7 @@ services:
             - .env
         environment:
             - DB_FILE_NAME=file:db.db
+            - NODE_ENV=production
         command: >
             sh -c "
                 npm run generate:prod
