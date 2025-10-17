@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1760690225271,
-      "tag": "0000_last_adam_warlock",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1760717396529,
-      "tag": "0001_mature_marvel_zombies",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1760717633885,
-      "tag": "0002_opposite_toxin",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1760718817502,
-      "tag": "0003_futuristic_ozymandias",
+      "when": 1760721495500,
+      "tag": "0000_naive_ogun",
       "breakpoints": true
     }
   ]

@@ -1,1 +1,0 @@
-ALTER TABLE `registeredAnswers` ADD `userId` integer NOT NULL;
