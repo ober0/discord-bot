@@ -52,7 +52,7 @@ export async function createVote(interaction: ChatInputCommandInteraction) {
         }
     }
 
-    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+    await interaction.deferReply();
 
     if (!answers.length) {
         return interaction.reply("Произошла ошибка, проверьте варианты ответа!");
