@@ -8,7 +8,9 @@
     "dev": "ts-node src/main.ts",
     "prod": "node dist/main.js",
     "update-slash-commands:prod": "node dist/register-slash-commands/main.js",
-    "update-slash-commands": "ts-node src/register-slash-commands/main.ts"
+    "update-slash-commands": "ts-node src/register-slash-commands/main.ts",
+    "generate": "npx drizzle-kit generate",
+    "migrate": "npx drizzle-kit migrate"
   },
   "devDependencies": {
     "eslint": "^9.37.0",
@@ -22,12 +24,18 @@
   "type": "commonjs",
   "dependencies": {
     "-": "^0.0.1",
+    "@libsql/client": "^0.15.15",
+    "@types/node": "^24.8.1",
     "@types/pino": "^7.0.4",
     "discord.js": "^14.23.2",
     "dotenv": "^17.2.3",
+    "drizzle-kit": "^0.31.5",
+    "drizzle-orm": "^0.44.6",
     "logger": "^0.0.1",
     "pino": "^10.0.0",
+    "sqlite3": "^5.1.7",
     "ts-node": "^10.9.2",
+    "tsx": "^4.20.6",
     "uuidv4": "^6.2.13"
   }
 }

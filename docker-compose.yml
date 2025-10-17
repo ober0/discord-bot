@@ -5,10 +5,16 @@ services:
         build: .
         container_name: ds-bot-1
         restart: always
+        volumes:
+            - ./db.db:/opt/app/db.db
         env_file:
             - .env
+        environment:
+            - DB_FILE_NAME=file:/opt/app/db.db
         command: >
             sh -c "
+                npm run generate
+                npm run migrate
                 npm run update-slash-commands:prod
                 npm run prod
             " 

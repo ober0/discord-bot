@@ -9,6 +9,7 @@ import { BOT_TOKEN, CLIENT_ID, GUILD_ID } from "../cfg";
 import { getActivities } from "./commands/activities";
 import { getPidorlist } from "./commands/pidorlist";
 import { getBlow } from "./commands/blow";
+import { getVote } from "./commands/vote";
 
 async function deleteAllCommands(rest: REST) {
     rest.put(Routes.applicationGuildCommands(CLIENT_ID!, GUILD_ID!), { body: [] }).catch(console.error);
@@ -29,6 +30,9 @@ async function deleteCreateCommands(rest: REST) {
 
     const blow = await getBlow();
     commands.push(...blow);
+
+    const vote = await getVote();
+    commands.push(...vote);
 
     rest.put(Routes.applicationGuildCommands(CLIENT_ID!, GUILD_ID!), { body: commands }).catch(console.error);
 

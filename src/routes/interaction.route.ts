@@ -18,5 +18,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
     } else if (command === "обоссать") {
         await blow(interaction);
         return;
+    } else if (command === "голосование" || command === "vote") {
     }
 });
