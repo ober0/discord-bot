@@ -6,8 +6,7 @@ export const quiz = sqliteTable("quiz", {
     channelId: text("channelId").notNull(),
     question: text("question").notNull(),
     someAnswer: integer("someAnswer").default(0),
-    remindAt: integer("remindAt").notNull(),
-    done: integer("done").notNull().default(0)
+    remindAt: integer("remindAt").notNull()
 });
 
 export const answerOption = sqliteTable("answerOption", {
@@ -20,5 +19,6 @@ export const registeredAnswers = sqliteTable("registeredAnswers", {
     id: integer("id").primaryKey({ autoIncrement: true }),
     quizId: integer("quizId").notNull(),
     answerId: integer("answerId").notNull(),
+    userId: text("userId").notNull(),
     createdAt: integer("createdAt").notNull()
 });

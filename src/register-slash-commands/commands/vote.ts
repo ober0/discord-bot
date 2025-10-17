@@ -12,6 +12,10 @@ export async function getVote(): Promise<RESTPostAPIChatInputApplicationCommands
                 .setName("несколько_ответов")
                 .setDescription("Разрешить несколько ответов? По умолчанию — true")
                 .setRequired(false)
+        )
+        .addIntegerOption((option) => option.setName("часы").setDescription("Время действия (часы)").setRequired(false))
+        .addIntegerOption((option) =>
+            option.setName("минуты").setDescription("Время действия (минуты)").setRequired(false)
         );
 
     const voteEn = new SlashCommandBuilder()
@@ -25,6 +29,10 @@ export async function getVote(): Promise<RESTPostAPIChatInputApplicationCommands
                 .setName("несколько_ответов")
                 .setDescription("Разрешить несколько ответов? По умолчанию — true")
                 .setRequired(false)
+        )
+        .addIntegerOption((option) => option.setName("часы").setDescription("Время действия (часы)").setRequired(false))
+        .addIntegerOption((option) =>
+            option.setName("минуты").setDescription("Время действия (минуты)").setRequired(false)
         );
 
     for (let i = 3; i <= 10; i++) {

@@ -4,7 +4,6 @@ export async function sendUptime(interaction: ChatInputCommandInteraction) {
     const uptimeSeconds = process.uptime();
     const startDate = new Date(Date.now() - uptimeSeconds * 1000);
 
-    // Форматирование сразу по МСК, без пересоздания объекта Date
     const moscowStartTime = startDate.toLocaleString("ru-RU", {
         timeZone: "Europe/Moscow",
         hour12: false

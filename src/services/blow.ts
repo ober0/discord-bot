@@ -7,6 +7,7 @@ import {
     MessageFlags
 } from "discord.js";
 import { v4 as uuidv4 } from "uuid";
+import { formatTimeMoscow } from "../tools/format-date";
 
 export async function blow(interaction: ChatInputCommandInteraction) {
     const user = interaction.options.getUser("юзер");
@@ -33,16 +34,7 @@ export async function blow(interaction: ChatInputCommandInteraction) {
             .setEmoji("💦");
     };
 
-    const endTime = new Date(Date.now() + 1000 * 60 * minutes);
-    const formattedEndTime = endTime.toLocaleString("ru-RU", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-        timeZone: "Europe/Moscow"
-    });
+    const formattedEndTime = formatTimeMoscow(new Date(Date.now() + 1000 * 60 * minutes));
 
     try {
         const response = await interaction.editReply({
