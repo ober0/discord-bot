@@ -23,3 +23,19 @@ export const registeredAnswers = sqliteTable("registeredAnswers", {
     userId: text("userId").notNull(),
     createdAt: integer("createdAt").notNull()
 });
+
+export const blow = sqliteTable("blow", {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    userId: text("userId").notNull(),
+    channelId: text("channelId").notNull(),
+    remindAt: integer("remindAt").notNull(),
+    minutes: integer("minutes").notNull(),
+    formattedEndTime: text("formattedEndTime").notNull(),
+    isEnd: integer("isEnd").notNull().default(0)
+});
+
+export const blowDoes = sqliteTable("blowDoes", {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    blowId: integer("blowId").notNull(),
+    userId: text("userId").notNull()
+});

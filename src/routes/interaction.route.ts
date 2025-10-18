@@ -2,7 +2,7 @@ import client from "../index";
 import { ButtonInteraction, ChatInputCommandInteraction, Events, MessageFlags } from "discord.js";
 import { getPidorLists } from "../services/get-pidor-lists";
 import { sendAllPresences } from "../services/send-all-presences";
-import { blow } from "../services/blow";
+import { blow, blowProcessing } from "../services/blow";
 import { sendUptime } from "../services/uptime";
 import { createVote } from "../services/vote";
 import { checkUserIsAdmin, checkUserIsAdminInteraction } from "../tools/check-admin.tools";
@@ -28,6 +28,9 @@ async function buttonRoute(interaction: ButtonInteraction) {
         case "check-quiz-vote":
             await checkQuizVote(interaction);
             break;
+        case "blow":
+            await blowProcessing(interaction);
+            return;
         default:
             await interaction.reply({ content: "Неизвестная ошибка", flags: MessageFlags.Ephemeral });
     }

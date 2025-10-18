@@ -1,0 +1,1 @@
+ALTER TABLE `blow` ADD `userId` text NOT NULL;

@@ -1,6 +1,7 @@
 import {
     ActionRowBuilder,
     ButtonBuilder,
+    ButtonInteraction,
     ButtonStyle,
     ChatInputCommandInteraction,
     ComponentType,
@@ -8,11 +9,14 @@ import {
 } from "discord.js";
 import { v4 as uuidv4 } from "uuid";
 import { formatTimeMoscow } from "../tools/format-date";
+import db from "../db/main";
+import { blow as blowTable, blowDoes } from "../db/schema";
+import { and, eq } from "drizzle-orm";
+import { integer, text } from "drizzle-orm/sqlite-core/index";
 
 export async function blow(interaction: ChatInputCommandInteraction) {
     const user = interaction.options.getUser("юзер");
     const minutes = interaction.options.getInteger("время") ?? 5;
-    const randomUuid = uuidv4();
 
     if (!user) {
         return await interaction.reply({
@@ -21,104 +25,101 @@ export async function blow(interaction: ChatInputCommandInteraction) {
         });
     }
 
+    const remindAt = Date.now() + minutes * 60 * 1000;
+
     await interaction.deferReply();
 
-    let count = 0;
-    const votedUsers = new Set<string>();
+    const formattedEndTime = formatTimeMoscow(new Date(Date.now() + 1000 * 60 * minutes));
+
+    const [blow] = await db
+        .insert(blowTable)
+        .values({
+            userId: user.id,
+            channelId: interaction.channelId,
+            remindAt,
+            formattedEndTime,
+            minutes
+        })
+        .returning();
 
     const createMainButton = (currentCount: number) => {
         return new ButtonBuilder()
-            .setCustomId(`blow-user-${user.id}-${randomUuid}`)
+            .setCustomId(`blow_${blow.id}`)
             .setLabel(`Обоссали ${currentCount} раз`)
             .setStyle(ButtonStyle.Primary)
             .setEmoji("💦");
     };
 
-    const formattedEndTime = formatTimeMoscow(new Date(Date.now() + 1000 * 60 * minutes));
+    const response = await interaction.editReply({
+        content: `<@${user.id}> **Тебя отпетушили!** \n\nНажмите на кнопку, чтобы **обоссать** ${user.username}\nУ вас есть **${minutes} минут (до ${formattedEndTime})**`,
+        components: [new ActionRowBuilder<ButtonBuilder>().addComponents(createMainButton(0))]
+    });
+}
 
-    try {
-        const response = await interaction.editReply({
-            content: `<@${user.id}> **Тебя отпетушили!** \n\nНажмите на кнопку, чтобы **обоссать** ${user.username}\nУ вас есть **${minutes} минут (до ${formattedEndTime} МСК)**`,
-            components: [new ActionRowBuilder<ButtonBuilder>().addComponents(createMainButton(count))]
+export async function blowProcessing(interaction: ButtonInteraction) {
+    const [_, blowIdStr] = interaction.customId.split("_");
+    const blowId = parseInt(blowIdStr);
+
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+
+    const [blow] = await db.select().from(blowTable).where(eq(blowTable.id, blowId));
+
+    if (!blow) {
+        await interaction.editReply({
+            content: "❌ Событие не найдено!"
         });
-
-        const collector = response.createMessageComponentCollector({
-            componentType: ComponentType.Button,
-            time: 1000 * 60 * minutes
-        });
-
-        collector.on("collect", async (i) => {
-            if (i.customId === `blow-user-${user.id}-${randomUuid}`) {
-                if (votedUsers.has(i.user.id)) {
-                    await i.reply({
-                        content: `🚫 Вы уже обоссали ${user.username}!`,
-                        ephemeral: true
-                    });
-                    return;
-                }
-
-                votedUsers.add(i.user.id);
-                count++;
-
-                const updatedButton = createMainButton(count);
-                const updatedRow = new ActionRowBuilder<ButtonBuilder>().addComponents(updatedButton);
-
-                try {
-                    await i.update({
-                        content: `<@${user.id}> **Тебя отпетушили!** \n\nНажмите на кнопку, чтобы обоссать ${user.username}\nУ вас есть **${minutes} минут (до ${formattedEndTime} МСК)**`,
-                        components: [updatedRow]
-                    });
-                } catch (error) {
-                    console.error("Ошибка при обновлении:", error);
-                }
-            }
-        });
-
-        collector.on("end", async (i) => {
-            const disabledButton = new ButtonBuilder()
-                .setCustomId(`blow-user-${user.id}-${randomUuid}`)
-                .setLabel(`Обоссали ${count} раз`)
-                .setStyle(ButtonStyle.Secondary)
-                .setEmoji("💦")
-                .setDisabled(true);
-
-            const disabledRow = new ActionRowBuilder<ButtonBuilder>().addComponents(disabledButton);
-
-            try {
-                await interaction.editReply({
-                    components: [disabledRow]
-                });
-
-                await interaction.followUp({
-                    content: `🏁 **Голосование завершено!**\nНа ${user} поссали ${count} человек`,
-                    allowedMentions: { users: [] }
-                });
-
-                if (votedUsers.size > 0) {
-                    const users = Array.from(votedUsers);
-                    const userPromises = users.map((userId) =>
-                        interaction.guild?.members.fetch(userId).catch(() => null)
-                    );
-                    const members = await Promise.all(userPromises);
-                    const validMembers = members.filter(Boolean);
-                    const userList = validMembers.map((member) => `• ${member?.user.username}`).join("\n");
-
-                    await interaction.followUp({
-                        content: `Список нажавших кнопку: \n${userList}`,
-                        flags: MessageFlags.Ephemeral
-                    });
-                }
-            } catch (error) {
-                console.error("Ошибка при завершении:", error);
-            }
-        });
-    } catch (error) {
-        console.error("Ошибка в команде blow:", error);
-        if (!interaction.replied) {
-            await interaction.followUp({
-                content: "Произошла ошибка при выполнении команды",
-                ephemeral: true
-            });
-        }
+        return;
     }
+
+    const blowedUser = await interaction.guild?.members.fetch(blow.userId);
+
+    if (!blowedUser) {
+        await interaction.editReply({
+            content: "❌ Пользователь не найден!"
+        });
+        return;
+    }
+
+    if (blow.remindAt < Date.now()) {
+        await interaction.editReply({
+            content: `🚫 Время чтобы обоссать ${blowedUser.user.username} вышло!`
+        });
+        return;
+    }
+
+    const alreadyBlowed = await db
+        .select()
+        .from(blowDoes)
+        .where(and(eq(blowDoes.blowId, blowId), eq(blowDoes.userId, interaction.user.id)));
+
+    if (alreadyBlowed.length) {
+        await interaction.editReply({
+            content: `🚫 Вы уже обоссали ${blowedUser.user.username}!`
+        });
+        return;
+    }
+
+    await db.insert(blowDoes).values({
+        blowId: blowId,
+        userId: interaction.user.id
+    });
+
+    const count = await db.$count(blowDoes, eq(blowDoes.blowId, blowId));
+
+    const updatedButton = new ButtonBuilder()
+        .setCustomId(`blow_${blowId}`)
+        .setLabel(`Обоссали ${count} раз`)
+        .setStyle(ButtonStyle.Primary)
+        .setEmoji("💦");
+
+    const updatedRow = new ActionRowBuilder<ButtonBuilder>().addComponents(updatedButton);
+
+    await interaction.message.edit({
+        content: `<@${blowedUser.user.id}> **Тебя отпетушили!** \n\nНажмите на кнопку, чтобы обоссать ${blowedUser.user.username}\nУ вас есть **${blow.minutes} минут (до ${blow.formattedEndTime})**`,
+        components: [updatedRow]
+    });
+
+    await interaction.editReply({
+        content: `✅ Вы успешно обоссали ${blowedUser.user.username}!`
+    });
 }
