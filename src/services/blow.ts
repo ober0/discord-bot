@@ -74,7 +74,7 @@ export async function blow(interaction: ChatInputCommandInteraction) {
             }
         });
 
-        collector.on("end", async () => {
+        collector.on("end", async (i) => {
             const disabledButton = new ButtonBuilder()
                 .setCustomId(`blow-user-${user.id}-${randomUuid}`)
                 .setLabel(`Обоссали ${count} раз`)

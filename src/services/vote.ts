@@ -35,6 +35,7 @@ export async function createVote(interaction: ChatInputCommandInteraction) {
     const timeMs = await calcTime(hours, minutes);
 
     const someAnswer = interaction.options.getBoolean("несколько_ответов") ?? false;
+    const isPublic = interaction.options.getBoolean("публичное") ?? true;
     const answers: { id: number; text: string }[] = [];
 
     for (let i: number = 1; i <= 10; i++) {
@@ -64,7 +65,8 @@ export async function createVote(interaction: ChatInputCommandInteraction) {
             channelId: interaction.channelId,
             question: question,
             someAnswer: Number(someAnswer),
-            remindAt: new Date().getTime() + timeMs
+            remindAt: new Date().getTime() + timeMs,
+            isPublic: Number(isPublic)
         })
         .returning();
 
@@ -90,11 +92,10 @@ export async function createVote(interaction: ChatInputCommandInteraction) {
         .setDescription(question)
         .setColor("Random")
         .setFooter({
-            text: someAnswer
-                ? "Можно выбрать несколько вариантов\n"
-                : "Только один вариант\n" + `До ${formattedEndTime} МСК`
-        })
-        .setTimestamp();
+            text: `• ${someAnswer ? "Можно выбрать несколько вариантов" : "Только один вариант"}\n• ${
+                isPublic ? "Проголосовавших видно всем" : "Голосование анонимно"
+            }\n• До ${formattedEndTime}`
+        });
 
     const buttons = await Promise.all(
         insertAnswers.flat().map(async (answer) => {

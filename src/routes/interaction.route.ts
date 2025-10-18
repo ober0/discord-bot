@@ -1,5 +1,5 @@
 import client from "../index";
-import { ButtonInteraction, ChatInputCommandInteraction, Events } from "discord.js";
+import { ButtonInteraction, ChatInputCommandInteraction, Events, MessageFlags } from "discord.js";
 import { getPidorLists } from "../services/get-pidor-lists";
 import { sendAllPresences } from "../services/send-all-presences";
 import { blow } from "../services/blow";
@@ -7,6 +7,7 @@ import { sendUptime } from "../services/uptime";
 import { createVote } from "../services/vote";
 import { checkUserIsAdmin, checkUserIsAdminInteraction } from "../tools/check-admin.tools";
 import { processingVote } from "../services/processing-vote";
+import { checkQuizVote } from "../interval-processing/processes/vote";
 
 client.on(Events.InteractionCreate, async (interaction) => {
     if (interaction.isChatInputCommand()) {
@@ -24,8 +25,11 @@ async function buttonRoute(interaction: ButtonInteraction) {
         case "vote":
             await processingVote(interaction);
             break;
+        case "check-quiz-vote":
+            await checkQuizVote(interaction);
+            break;
         default:
-            await interaction.reply("Неизвестная ошибка");
+            await interaction.reply({ content: "Неизвестная ошибка", flags: MessageFlags.Ephemeral });
     }
 }
 

@@ -13,6 +13,12 @@ export async function getVote(): Promise<RESTPostAPIChatInputApplicationCommands
                 .setDescription("Разрешить несколько ответов? По умолчанию — true")
                 .setRequired(false)
         )
+        .addBooleanOption((option) =>
+            option
+                .setName("публичное")
+                .setDescription("Проголосовавших видно всем? По умолчанию — true")
+                .setRequired(false)
+        )
         .addIntegerOption((option) => option.setName("часы").setDescription("Время действия (часы)").setRequired(false))
         .addIntegerOption((option) =>
             option.setName("минуты").setDescription("Время действия (минуты)").setRequired(false)
@@ -28,6 +34,12 @@ export async function getVote(): Promise<RESTPostAPIChatInputApplicationCommands
             option
                 .setName("несколько_ответов")
                 .setDescription("Разрешить несколько ответов? По умолчанию — true")
+                .setRequired(false)
+        )
+        .addBooleanOption((option) =>
+            option
+                .setName("публичное")
+                .setDescription("Проголосовавших видно всем? По умолчанию — true")
                 .setRequired(false)
         )
         .addIntegerOption((option) => option.setName("часы").setDescription("Время действия (часы)").setRequired(false))
