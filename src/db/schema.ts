@@ -43,5 +43,6 @@ export const blowDoes = sqliteTable("blowDoes", {
 export const trollVoice = sqliteTable("trollVoice", {
     id: integer("id").primaryKey({ autoIncrement: true }),
     createdAt: integer("createdAt").notNull(),
-    userId: text("userId").notNull()
+    userId: text("userId").notNull(),
+    creatorId: text("creatorId").notNull()
 });

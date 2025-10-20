@@ -9,10 +9,10 @@ import {
 } from "discord.js";
 import db from "../db/main";
 import { trollVoice } from "../db/schema";
-import { gt } from "drizzle-orm";
+import { and, eq, gt } from "drizzle-orm";
 import { STAFF_VOICE_ID } from "../cfg";
 
-const timeout = 1000 * 60 * 10;
+const timeout = 1000 * 60 * 30; // 30 мин
 
 export async function processingTrollVoice(interaction: ChatInputCommandInteraction, isAdmin: boolean) {
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
@@ -41,14 +41,28 @@ export async function processingTrollVoice(interaction: ChatInputCommandInteract
         });
     }
 
-    const count = await db.$count(trollVoice, gt(trollVoice.createdAt, Date.now() - timeout));
+    const [count1, count2] = await Promise.all([
+        db.$count(trollVoice, and(gt(trollVoice.createdAt, Date.now() - timeout), eq(trollVoice.userId, user.id))),
+        db.$count(trollVoice, and(gt(trollVoice.createdAt, Date.now() - timeout), eq(trollVoice.userId, user.id)))
+    ]);
 
-    // if (count > 0 && !isAdmin) {
-    if (count > 0) {
+    await db.insert(trollVoice).values({
+        createdAt: Date.now(),
+        creatorId: interaction.user.id,
+        userId: user.id
+    });
+
+    if (count1 > 0 && !isAdmin) {
         return interaction.editReply({
-            content: "❌ Пользователь уже мучался в последние 10 минут. Подождите немного!"
+            content: "❌ Пользователь уже мучался в последние 30 минут. Подождите немного!"
         });
     }
+    if (count2 > 0 && !isAdmin) {
+        return interaction.editReply({
+            content: "❌ Пв уже мучали пользователя в последние 30 минут. Подождите немного!"
+        });
+    }
+
     const voice = member?.voice;
 
     const currentChannelId = voice.channel?.id;

@@ -9,9 +9,8 @@
     "prod": "node dist/main.js",
     "update-slash-commands:prod": "node dist/register-slash-commands/main.js",
     "update-slash-commands": "ts-node src/register-slash-commands/main.ts",
-    "generate:dev": "npx drizzle-kit generate",
+    "generate": "npx drizzle-kit generate",
     "migrate:dev": "npx drizzle-kit migrate",
-    "generate:prod": "npx drizzle-kit generate --config dist/drizzle.config.prod.js",
     "migrate:prod": "npx drizzle-kit migrate --config dist/drizzle.config.prod.js"
   },
   "devDependencies": {

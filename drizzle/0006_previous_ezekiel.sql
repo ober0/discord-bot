@@ -1,0 +1,1 @@
+ALTER TABLE `trollVoice` ADD `creatorId` text NOT NULL;
