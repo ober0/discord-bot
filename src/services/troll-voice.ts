@@ -1,4 +1,12 @@
-import { ChannelType, ChatInputCommandInteraction, CommandInteraction, MessageFlags } from "discord.js";
+import {
+    ChannelType,
+    ChatInputCommandInteraction,
+    Colors,
+    CommandInteraction,
+    EmbedBuilder,
+    MessageFlags,
+    TextChannel
+} from "discord.js";
 import db from "../db/main";
 import { trollVoice } from "../db/schema";
 import { gt } from "drizzle-orm";
@@ -89,7 +97,21 @@ export async function processingTrollVoice(interaction: ChatInputCommandInteract
     await voice.setMute(false, "Так надо, бро");
     await member.voice.setChannel(currentChannelId);
 
-    return interaction.editReply({
-        content: "Пользователь отмучался (наверно...)"
-    });
+    const announcementChannel = interaction.channel;
+
+    if (announcementChannel && announcementChannel.isTextBased() && "send" in announcementChannel) {
+        const embed = new EmbedBuilder()
+            .setTitle("🔔 Мучение завершено!")
+            .setColor(Colors.Red)
+            .addFields(
+                { name: "Пользователь", value: member.user.tag, inline: true },
+                { name: "Команду вызвал", value: interaction.user.tag, inline: true },
+                { name: "Перемещений", value: transfers.toString(), inline: true },
+                { name: "Задержка", value: `${delay ?? 500} мс`, inline: true }
+            )
+            .setFooter({ text: "Бот заботится о порядке!" })
+            .setTimestamp();
+
+        await announcementChannel.send({ embeds: [embed] });
+    }
 }
