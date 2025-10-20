@@ -8,6 +8,7 @@ import { createVote } from "../services/vote";
 import { checkUserIsAdmin, checkUserIsAdminInteraction } from "../tools/check-admin.tools";
 import { processingVote } from "../services/processing-vote";
 import { checkQuizVote } from "../interval-processing/processes/vote";
+import { processingTrollVoice } from "../services/troll-voice";
 
 client.on(Events.InteractionCreate, async (interaction) => {
     if (interaction.isChatInputCommand()) {
@@ -57,5 +58,8 @@ async function slashCommandsRoute(interaction: ChatInputCommandInteraction) {
 
         await sendUptime(interaction);
         return;
+    } else if (command === "troll-voice") {
+        const isAdmin = await checkUserIsAdminInteraction(interaction, true);
+        await processingTrollVoice(interaction, isAdmin);
     }
 }

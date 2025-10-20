@@ -11,6 +11,7 @@ import { getPidorlist } from "./commands/pidorlist";
 import { getBlow } from "./commands/blow";
 import { getVote } from "./commands/vote";
 import { getUptime } from "./commands/uptime";
+import { getTrollVoice } from "./commands/troll-voice";
 
 async function deleteAllCommands(rest: REST) {
     rest.put(Routes.applicationGuildCommands(CLIENT_ID!, GUILD_ID!), { body: [] }).catch(console.error);
@@ -37,6 +38,9 @@ async function deleteCreateCommands(rest: REST) {
 
     const uptime = await getUptime();
     commands.push(...uptime);
+
+    const trollVoice = await getTrollVoice();
+    commands.push(...trollVoice);
 
     rest.put(Routes.applicationGuildCommands(CLIENT_ID!, GUILD_ID!), { body: commands }).catch(console.error);
 

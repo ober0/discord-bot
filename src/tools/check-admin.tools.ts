@@ -14,7 +14,10 @@ export async function checkUserIsAdmin(message: Message): Promise<boolean> {
     return true;
 }
 
-export async function checkUserIsAdminInteraction(interaction: ChatInputCommandInteraction): Promise<boolean> {
+export async function checkUserIsAdminInteraction(
+    interaction: ChatInputCommandInteraction,
+    onlyReturn: boolean = false
+): Promise<boolean> {
     const member = interaction.member;
 
     if (!member) return false;
@@ -28,10 +31,12 @@ export async function checkUserIsAdminInteraction(interaction: ChatInputCommandI
     }
 
     if (!hasRole) {
-        await interaction.reply({
-            content: `<@${interaction.user.id}>, у тебя недостаточно прав 😏`,
-            flags: MessageFlags.Ephemeral
-        });
+        if (!onlyReturn) {
+            await interaction.reply({
+                content: `<@${interaction.user.id}>, у тебя недостаточно прав 😏`,
+                flags: MessageFlags.Ephemeral
+            });
+        }
         return false;
     }
 

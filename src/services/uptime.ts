@@ -29,7 +29,8 @@ export async function sendUptime(interaction: ChatInputCommandInteraction) {
         .setTitle("📊 Аптайм бота")
         .addFields(
             { name: "⏰ Время запуска (МСК)", value: moscowStartTime },
-            { name: "🕐 Время работы", value: uptimeString }
+            { name: "🕐 Время работы", value: uptimeString },
+            { name: "Режим", value: process.env.NODE_ENV!.toString() }
         )
         .setFooter({ text: `Текущее время (МСК): ${nowMoscowTime}` });
 
