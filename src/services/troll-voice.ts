@@ -108,8 +108,8 @@ export async function processingTrollVoice(interaction: ChatInputCommandInteract
         await new Promise((resolve) => setTimeout(resolve, delay ?? 500));
     }
 
-    await voice.setMute(false, "Так надо, бро");
     await member.voice.setChannel(currentChannelId);
+    await voice.setMute(false, "Так надо, бро");
 
     const announcementChannel = interaction.channel;
 
