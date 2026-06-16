@@ -43,7 +43,10 @@ export async function processingTrollVoice(interaction: ChatInputCommandInteract
 
     const [count1, count2] = await Promise.all([
         db.$count(trollVoice, and(gt(trollVoice.createdAt, Date.now() - timeout), eq(trollVoice.userId, user.id))),
-        db.$count(trollVoice, and(gt(trollVoice.createdAt, Date.now() - timeout), eq(trollVoice.userId, user.id)))
+        db.$count(
+            trollVoice,
+            and(gt(trollVoice.createdAt, Date.now() - timeout), eq(trollVoice.creatorId, interaction.user.id))
+        )
     ]);
 
     await db.insert(trollVoice).values({

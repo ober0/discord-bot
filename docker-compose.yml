@@ -1,16 +1,15 @@
 version: "3.9"
 
 services:
-    ds-bot-1:
+    ds-bot:
         build: .
-        container_name: ds-bot-1
+        container_name: ds-bot
         restart: always
         volumes:
             - ./db.db:/opt/app/db.db
         env_file:
             - .env
         environment:
-            - DB_FILE_NAME=file:db.db
             - NODE_ENV=production
         command: >
             sh -c "
